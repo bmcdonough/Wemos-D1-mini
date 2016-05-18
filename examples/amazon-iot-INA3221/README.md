@@ -13,4 +13,5 @@
 ## code example
 
 ## results
-
+1. need to add details for results from URL:
+  * https://mobile.awsblog.com/post/TxQRWEM9DK0VNR/Analyze-device-generated-data-with-AWS-IoT-and-Amazon-Elasticsearch-Service
