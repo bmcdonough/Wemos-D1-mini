@@ -17,3 +17,19 @@
   * https://mobile.awsblog.com/post/TxQRWEM9DK0VNR/Analyze-device-generated-data-with-AWS-IoT-and-Amazon-Elasticsearch-Service
 
 1. Go to the Amazon Elasticsearch console and create a new domain with name "digital-voltage".
+
+```XML
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::002623777582:user/ElasticUser"
+      },
+      "Action": "es:*",
+      "Resource": "arn:aws:es:us-east-1:002623777582:domain/digital-voltage/*"
+    }
+  ]
+}
+```
