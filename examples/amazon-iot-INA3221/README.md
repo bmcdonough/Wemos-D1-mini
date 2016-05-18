@@ -15,4 +15,5 @@
 ## results
  * need to add details for results from URL:
   * https://mobile.awsblog.com/post/TxQRWEM9DK0VNR/Analyze-device-generated-data-with-AWS-IoT-and-Amazon-Elasticsearch-Service
+
 1. Go to the Amazon Elasticsearch console and create a new domain with name "digital-voltage".
