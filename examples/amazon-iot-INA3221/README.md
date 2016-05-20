@@ -16,9 +16,12 @@
  * need to add details for results from URL:
   * https://mobile.awsblog.com/post/TxQRWEM9DK0VNR/Analyze-device-generated-data-with-AWS-IoT-and-Amazon-Elasticsearch-Service
 
-1. Go to the Amazon Elasticsearch console and create a new domain with name "digital-voltage".
 
-```xml
+1. Create IAM user:  Identity and Access Management
+
+2. Go to the Amazon Elasticsearch console and create a new domain with name "digital-voltage".
+
+```json
 {
   "Version": "2012-10-17",
   "Statement": [
