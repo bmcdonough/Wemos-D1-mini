@@ -25,10 +25,10 @@
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::002623777582:user/ElasticUser"
+        "AWS": "arn:aws:iam::xxxxxxxxxxxx:user/ElasticUser"
       },
       "Action": "es:*",
-      "Resource": "arn:aws:es:us-east-1:002623777582:domain/digital-voltage/*"
+      "Resource": "arn:aws:es:us-east-1:xxxxxxxxxxxx:domain/digital-voltage/*"
     }
   ]
 }
