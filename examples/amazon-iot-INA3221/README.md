@@ -24,7 +24,7 @@
 
 2. Go to the Amazon Elasticsearch console and create a new domain with name "digital-voltage".
 
-```json
+```JSON
 {
   "Version": "2012-10-17",
   "Statement": [
