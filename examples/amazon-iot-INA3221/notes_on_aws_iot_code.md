@@ -21,7 +21,7 @@
 ```  
   
   
-#  within AWSFoundationTypes.h
+#  AWSFoundationTypes.h
 ```Arduino
  /* A wrapper for c_strings that has a deep-copying equality operator and
  * constructor, as well as json serialization and deserialization
