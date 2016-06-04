@@ -1,3 +1,7 @@
+# NOTE - 20160604
+ * install arduino latest version
+ * http://arduino.esp8266.com/stable/package_esp8266com_index.json
+
 # NOTE - 20160525
  * need to change IOTclient from UpdateShadow to Publish
 
