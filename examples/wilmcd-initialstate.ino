@@ -147,10 +147,17 @@ void setupwiffy()
   Serial.print(wifiSsid);
   Serial.println("...");
 
+  int wifi_counter = 0;
+
   WiFi.begin(wifiSsid, wifiPwd);
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(50);
+    wifi_counter++;
+    if (wifi_counter > 200) {
+      Serial.println("\nno Wiffy, SleepyTime");
+      ESP.deepSleep(sleepTimeS * 1000000);
+    }
   }
 
   Serial.println("");
