@@ -46,7 +46,7 @@ void checkDigitalVoltage();
 ////////////////////////////
 // Initial State Streamer //
 ////////////////////////////
- 
+
 // Data destination
 // https can't be handled by the ESP8266, thus "insecure"
 #define ISDestURL "insecure-groker.initialstate.com"
@@ -57,9 +57,9 @@ void checkDigitalVoltage();
 // Access key (the one you find in your account settings):
 #define accessKey "fBt7dSCtjsOD5bNMoCzGHQ0m27GSkwNo"
 // How many signals are in your stream? You can have as few or as many as you want
-const int NUM_SIGNALS = 8;
+const int NUM_SIGNALS = 13;
 // What are the names of your signals (i.e. "Temperature", "Humidity", etc.)
-String signalName[NUM_SIGNALS] = {"1LIPO_Battery Bus Voltage V", "1LIPO_Battery Shunt Voltage mV", "1LIPO_Battery Load Voltage V", "1LIPO_Battery Current mA", "Solar Cell Bus Voltage V", "Solar Cell Shunt Voltage mV", "Solar Cell Load Voltage V", "Solar Cell Current mA"};
+String signalName[NUM_SIGNALS] = {"RSSI", "1LIPO_Battery Bus Voltage V", "1LIPO_Battery Shunt Voltage mV", "1LIPO_Battery Load Voltage V", "1LIPO_Battery Current mA", "Solar Cell Bus Voltage V", "Solar Cell Shunt Voltage mV", "Solar Cell Load Voltage V", "Solar Cell Current mA", "Car_Battery Bus Voltage V", "Car_Battery Shunt Voltage mV", "Car_Battery Load Voltage V", "Car_Battery Current mA"};
 // This array is to store our signal data later
 String signalData[NUM_SIGNALS];
 
@@ -69,7 +69,7 @@ String signalData[NUM_SIGNALS];
 
 //Signal number 1
 int i = 0;
-//Signal number 2 
+//Signal number 2
 bool increase = true;
 
 // the three channels of the INA3221 named for SunAirPlus Solar Power Controller channels (www.switchdoc.com)
@@ -90,6 +90,7 @@ void setup() {
   Serial.println("Measuring voltage and current with ina3221 ...");
   ina3221.begin();
 
+  setupwiffy();
   checkDigitalVoltage();
   Serial.println("SleepyTime");
   ESP.deepSleep(sleepTimeS * 1000000);
@@ -139,9 +140,32 @@ bool sensorIsDisabled() {
 //  return digitalRead(sensorSwitch) == LOW;
 }
 
+void setupwiffy()
+{
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.print(wifiSsid);
+  Serial.println("...");
+
+  WiFi.begin(wifiSsid, wifiPwd);
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(50);
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+
+  printCurrentNetwork();
+  printWiFiData();
+
+  delay(50);
+}
+
+
 
 void publish(const char *topic, float data) {
-  
+
   //AmazonIOTClient iotClient;
   //ActionError actionError;
 
@@ -158,10 +182,10 @@ void publish(const char *topic, float data) {
     Serial.print(".");
     delay(50);
   }
-  
+
   Serial.println("");
   Serial.println("WiFi connected");
-  
+
   printCurrentNetwork();
   printWiFiData();
 
@@ -181,7 +205,7 @@ void publish(const char *topic, float data) {
   delay(50);
 
   Serial.println("Updating thing shadow...");
-  
+
   //MinimalString shadow = ("{\"state\":{\"reported\":{\"" + String(topic) + "\":" + String(data, 2) + "}}}").c_str();
   //char* result = iotClient.update_shadow(shadow, actionError);
   delay(50);
@@ -213,16 +237,16 @@ bool postBucket() {
     toSend += "Accept-Version: ~0\r\n";
     toSend += "X-IS-AccessKey: " accessKey "\r\n";
     toSend += "Content-Type: application/json\r\n";
-    String payload = "{\"bucketKey\": \"" bucketKey "\","; 
+    String payload = "{\"bucketKey\": \"" bucketKey "\",";
     payload += "\"bucketName\": \"" bucketName "\"}";
-    payload += "\r\n"; 
+    payload += "\r\n";
     toSend += "Content-Length: "+String(payload.length())+"\r\n";
     toSend += "\r\n";
     toSend += payload;
-    
+
     client.println(toSend);
     Serial.println(toSend);
-  
+
     return true;
   } else {
     // if you couldn't make a connection:
@@ -256,13 +280,13 @@ bool postData() {
     toSend += "X-IS-AccessKey:  " accessKey "\r\n";
     toSend += "X-IS-BucketKey:  " bucketKey "\r\n";
 
-      String payload = "[{\"key\": \"" + signalName[i] + "\", "; 
+      String payload = "[{\"key\": \"" + signalName[i] + "\", ";
       payload +="\"value\": \"" + signalData[i] + "\"}]\r\n";
-    
+
     toSend += "Content-Length: " + String(payload.length())+"\r\n";
     toSend += "\r\n";
     toSend += payload;
-    
+
     Serial.println(toSend);
     client.println(toSend);
 
@@ -273,13 +297,13 @@ bool postData() {
         client.stop();
       }
     }
-  
+
   // Read all the lines of the reply from server and print them to Serial
   while(client.available()){
     String line = client.readStringUntil('\r');
     Serial.print(line);
   }
-  
+
   Serial.println();
   Serial.println("closing connection");
 
@@ -306,7 +330,7 @@ void checkDigitalVoltage() {
   shuntvoltage1 = ina3221.getShuntVoltage_mV(LIPO_BATTERY_CHANNEL);
   current_mA1 = -ina3221.getCurrent_mA(LIPO_BATTERY_CHANNEL);  // minus is to get the "sense" right.   - means the battery is charging, + that it is discharging
   loadvoltage1 = busvoltage1 + (shuntvoltage1 / 1000);
-  
+
   Serial.print("LIPO_Battery Bus Voltage:   "); Serial.print(busvoltage1); Serial.println(" V");
   Serial.print("LIPO_Battery Shunt Voltage: "); Serial.print(shuntvoltage1); Serial.println(" mV");
   Serial.print("LIPO_Battery Load Voltage:  "); Serial.print(loadvoltage1); Serial.println(" V");
@@ -322,7 +346,7 @@ void checkDigitalVoltage() {
   shuntvoltage2 = ina3221.getShuntVoltage_mV(SOLAR_CELL_CHANNEL);
   current_mA2 = -ina3221.getCurrent_mA(SOLAR_CELL_CHANNEL);
   loadvoltage2 = busvoltage2 + (shuntvoltage2 / 1000);
-  
+
   Serial.print("Solar Cell Bus Voltage 2:   "); Serial.print(busvoltage2); Serial.println(" V");
   Serial.print("Solar Cell Shunt Voltage 2: "); Serial.print(shuntvoltage2); Serial.println(" mV");
   Serial.print("Solar Cell Load Voltage 2:  "); Serial.print(loadvoltage2); Serial.println(" V");
@@ -338,7 +362,7 @@ void checkDigitalVoltage() {
   shuntvoltage3 = ina3221.getShuntVoltage_mV(OUTPUT_CHANNEL);
   current_mA3 = ina3221.getCurrent_mA(OUTPUT_CHANNEL);
   loadvoltage3 = busvoltage3 + (shuntvoltage3 / 1000);
-  
+
   Serial.print("Output Bus Voltage 3:   "); Serial.print(busvoltage3); Serial.println(" V");
   Serial.print("Output Shunt Voltage 3: "); Serial.print(shuntvoltage3); Serial.println(" mV");
   Serial.print("Output Load Voltage 3:  "); Serial.print(loadvoltage3); Serial.println(" V");
@@ -348,18 +372,23 @@ void checkDigitalVoltage() {
   //publish("busvoltage1", busvoltage1);
   // Gather Data
   // Read from a port for input or output or generate your own values/messages
-  signalData[0] = String(busvoltage1, 2);
-  signalData[1] = String(shuntvoltage1, 2);
-  signalData[2] = String(loadvoltage1, 2);
-  signalData[3] = String(current_mA1, 2);
-  signalData[4] = String(busvoltage2, 2);
-  signalData[5] = String(shuntvoltage2, 2);
-  signalData[6] = String(loadvoltage2, 2);
-  signalData[7] = String(current_mA2, 2);
- 
+  signalData[0] = WiFi.RSSI();
+  signalData[1] = String(busvoltage1, 2);
+  signalData[2] = String(shuntvoltage1, 2);
+  signalData[3] = String(loadvoltage1, 2);
+  signalData[4] = String(current_mA1, 2);
+  signalData[5] = String(busvoltage2, 2);
+  signalData[6] = String(shuntvoltage2, 2);
+  signalData[7] = String(loadvoltage2, 2);
+  signalData[8] = String(current_mA2, 2);
+  signalData[9] = String(busvoltage3, 2);
+  signalData[10] = String(shuntvoltage3, 2);
+  signalData[11] = String(loadvoltage3, 2);
+  signalData[12] = String(current_mA3, 2);
+
   // The postData() function streams our events
-  while(!postData());   
- 
+  while(!postData());
+
   // Wait for 1 seconds before collecting and sending the next batch
   delay(1000);
 }
